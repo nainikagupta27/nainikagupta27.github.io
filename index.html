@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nainika Gupta</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Nainika Gupta — biomedical engineering student at Duke University. Research, projects, and the next move.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single scroll in three acts (Opening / Middlegame / Endgame), each act a "board" with
+   coordinate-labelled edges; checker strips mark the transitions between acts. Single committed
+   navy-and-ivory look (not theme-switched). */
+:root{
+  --navy:#112443;
+  --midnight:#0A172B;
+  --ivory:#F7F5EF;
+  --white:#FFFFFF;
+  --mist:#AAB9CE;
+  --slate:#526782;
+  --ivory-2:#EFECE3;                  /* ivory one step darker, for quiet fills */
+  --line:rgba(17,36,67,.14);
+  --line-strong:rgba(17,36,67,.32);
+  --line-dark:rgba(170,185,206,.22);
+
+  --display:"DM Serif Display", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --sans:"Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --step--1:.8125rem; --step-0:1rem; --step-1:1.1875rem; --step-2:1.5rem;
+  --step-3:2.125rem; --step-4:clamp(2.5rem,5vw,3.5rem); --step-5:clamp(3.25rem,9vw,7rem);
+
+  --radius:6px;
+  --wrap:1180px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:84px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--ivory); color:var(--navy); font-family:var(--sans); font-size:var(--step-0); line-height:1.6; -webkit-font-smoothing:antialiased}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:60; background:var(--ivory)}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--slate); outline-offset:3px; border-radius:2px}
+h1,h2,h3,h4{font-family:var(--display); font-weight:400; line-height:1.08; margin:0; text-wrap:balance; letter-spacing:-.005em}
+p{margin:0}
+ul{margin:0; padding:0; list-style:none}
+
+.wrap{max-width:var(--wrap); margin:0 auto; padding-left:max(20px, env(safe-area-inset-left,0px)); padding-right:max(20px, env(safe-area-inset-right,0px))}
+.label{font-family:var(--mono); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--slate)}
+.ph{background:repeating-linear-gradient(90deg, rgba(82,103,130,.12) 0 6px, rgba(82,103,130,.06) 6px 12px); border-bottom:1px dashed var(--slate); color:var(--slate); padding:0 .2em; border-radius:2px; font-style:normal}
+.dark .ph{background:rgba(170,185,206,.12); border-bottom-color:var(--mist); color:var(--mist)}
+
+/* ── checker utilities ─────────────────────────────── */
+.checker{--a:var(--navy); --b:var(--ivory); --s:14px;
+  background-image:conic-gradient(var(--a) 0 25%, var(--b) 0 50%, var(--a) 0 75%, var(--b) 0);
+  background-size:calc(var(--s)*2) calc(var(--s)*2)}
+.strip{height:14px; --s:14px}
+.strip.lg{height:28px; --s:28px}
+.strip.sm{height:8px; --s:8px}
+
+/* ── nav ───────────────────────────────────────────── */
+.nav{position:sticky; top:env(safe-area-inset-top,0px); z-index:50; background:rgba(247,245,239,.94); border-bottom:1px solid var(--line); backdrop-filter:saturate(1.2) blur(6px)}
+.nav .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px; height:64px}
+.mark{display:flex; align-items:center; gap:10px; text-decoration:none}
+.mark-sq{width:26px; height:26px; --s:6.5px; border:1px solid var(--navy)}
+.mark-name{font-family:var(--display); font-size:1.15rem}
+.nav-links{display:flex; gap:4px; align-items:center}
+.nav-links a{position:relative; text-decoration:none; padding:8px 14px; font-size:.875rem; font-weight:600; color:var(--slate); border-radius:4px; display:flex; gap:8px; align-items:baseline; transition:color .2s}
+.nav-links a .n{font-family:var(--mono); font-size:.7rem; font-weight:400; color:var(--mist)}
+.nav-links a:hover{color:var(--navy)}
+.nav-links a[aria-current="true"]{color:var(--navy)}
+.nav-links a::after{content:""; position:absolute; left:14px; right:14px; bottom:2px; height:2px; background:var(--navy); transform:scaleX(0); transform-origin:left; transition:transform .3s}
+.nav-links a[aria-current="true"]::after{transform:scaleX(1)}
+.menu-btn{display:none; background:none; border:1px solid var(--line-strong); border-radius:4px; padding:8px 12px; font:600 .8rem var(--sans); color:var(--navy); cursor:pointer}
+@media (max-width:720px){
+  .menu-btn{display:block}
+  .nav-links{position:absolute; top:100%; left:0; right:0; flex-direction:column; align-items:stretch; background:var(--ivory); border-bottom:1px solid var(--line); padding:8px max(20px, env(safe-area-inset-right,0px)) 16px max(20px, env(safe-area-inset-left,0px)); gap:0}
+  .nav-links[data-open="false"]{display:none}
+  .nav-links a{padding:14px 0; border-bottom:1px solid var(--line); border-radius:0}
+  .nav-links a::after{left:0; right:auto; width:24px; bottom:-1px}
+}
+
+/* ── act headers ───────────────────────────────────── */
+.act-head{display:grid; grid-template-columns:auto 1fr; gap:6px 28px; align-items:end; padding-block:clamp(56px,8vw,96px) 32px}
+.act-num{font-family:var(--display); font-size:var(--step-5); line-height:.8; color:var(--mist); grid-row:span 2}
+.act-head h2{font-size:var(--step-4)}
+.act-head .label{align-self:end}
+@media (max-width:560px){.act-head{grid-template-columns:1fr}.act-num{grid-row:auto; font-size:3rem}}
+
+/* ── OPENING ───────────────────────────────────────── */
+.hero{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:clamp(32px,6vw,80px); align-items:center; padding-block:clamp(40px,7vw,88px) clamp(40px,6vw,72px)}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero-text{min-width:0; display:flex; flex-direction:column; gap:22px}
+.hero h1{font-size:var(--step-5); line-height:.92}
+.hero h1 em{font-style:italic; color:var(--slate)}
+.tagline{font-family:var(--display); font-style:italic; font-size:var(--step-2); line-height:1.3; color:var(--navy); max-width:28ch}
+.intro{max-width:58ch; color:#2b3b55; font-size:1.0625rem}
+.hero-cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:6px}
+.btn{display:inline-flex; align-items:center; gap:10px; text-decoration:none; font-weight:600; font-size:.9rem; padding:12px 20px; border-radius:4px; border:1px solid var(--navy); transition:background .2s, color .2s, transform .2s; cursor:pointer; font-family:var(--sans)}
+.btn-solid{background:var(--navy); color:var(--ivory)}
+.btn-solid:hover{background:var(--midnight)}
+.btn-ghost{background:transparent; color:var(--navy)}
+.btn-ghost:hover{background:var(--navy); color:var(--ivory)}
+.btn .arr{transition:transform .2s}
+.btn:hover .arr{transform:translateY(2px)}
+
+/* board */
+.board-wrap{position:relative; width:100%; max-width:470px; justify-self:center}
+.board-frame{display:grid; grid-template-columns:18px 1fr; grid-template-rows:1fr 18px; gap:6px}
+.ranks,.files{font-family:var(--mono); font-size:.66rem; color:var(--slate); display:grid}
+.ranks{grid-template-rows:repeat(8,1fr); align-items:center; text-align:center}
+.files{grid-column:2; grid-template-columns:repeat(8,1fr); text-align:center}
+.board{position:relative; aspect-ratio:1; max-width:100%; display:grid; grid-template-columns:repeat(8,1fr); border:1px solid var(--navy); box-shadow:10px 10px 0 var(--ivory-2), 10px 10px 0 1px var(--line-strong)}
+.sq{position:relative}
+.sq.d{background:var(--navy)}
+.sq.l{background:var(--white)}
+.sq.hl.l{background:#E3E8F0}
+.sq.hl.d{background:#26406A}
+.piece{position:absolute; width:12.5%; height:12.5%; display:grid; place-items:center; transition:left .9s cubic-bezier(.6,.05,.25,1), top .9s cubic-bezier(.6,.05,.25,1); pointer-events:none}
+.piece svg{width:76%; height:76%}
+.piece.ghost{opacity:.22}
+.board-note{display:flex; justify-content:space-between; gap:12px; margin-top:22px; padding-top:12px; border-top:1px solid var(--line)}
+.board-note .move{font-family:var(--display); font-size:1.25rem}
+@media (prefers-reduced-motion:reduce){.piece{transition:none}}
+
+/* education + preview */
+.opening-lower{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:24px; padding-bottom:clamp(56px,8vw,96px)}
+@media (max-width:860px){.opening-lower{grid-template-columns:1fr}}
+.edu{border:1px solid var(--line-strong); border-radius:var(--radius); background:var(--white); padding:28px; display:flex; flex-direction:column; gap:18px}
+.edu h3{font-size:var(--step-3)}
+.edu dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:10px 18px; font-size:.92rem}
+.edu dt{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--slate); padding-top:3px}
+.edu dd{margin:0; min-width:0}
+.preview{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); border:1px solid var(--line-strong); border-radius:var(--radius); overflow:hidden}
+.preview a{display:flex; flex-direction:column; gap:8px; padding:22px; text-decoration:none; border-right:1px solid var(--line); border-bottom:1px solid var(--line); transition:background .2s, color .2s; min-width:0}
+.preview a:nth-child(2n){border-right:0}
+.preview a:nth-last-child(-n+2){border-bottom:0}
+.preview a:hover{background:var(--navy); color:var(--ivory)}
+.preview a:hover .label{color:var(--mist)}
+.preview a:hover p{color:var(--mist)}
+.preview h4{font-size:1.4rem}
+.preview p{font-size:.88rem; color:var(--slate)}
+@media (max-width:480px){.preview{grid-template-columns:1fr}.preview a{border-right:0}.preview a:nth-last-child(2){border-bottom:1px solid var(--line)}}
+
+/* ── MIDDLEGAME ────────────────────────────────────── */
+.middlegame{background:var(--white); border-block:1px solid var(--line)}
+.sub{padding-block:44px 64px; border-top:1px solid var(--line)}
+.sub:first-of-type{border-top:0}
+.sub-head{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:end; gap:12px 32px; margin-bottom:32px}
+.sub-head h3{font-size:var(--step-3); display:flex; align-items:baseline; gap:14px}
+.sub-head h3 .file{font-family:var(--mono); font-size:.8rem; color:var(--slate); border:1px solid var(--line-strong); padding:2px 7px; border-radius:3px; transform:translateY(-6px)}
+.sub-head p{max-width:46ch; color:var(--slate); font-size:.95rem}
+
+.grid{display:grid; gap:20px}
+.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:960px){.grid-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:680px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+.card{position:relative; background:var(--ivory); border:1px solid var(--line); border-radius:var(--radius); padding:26px; display:flex; flex-direction:column; gap:14px; transition:border-color .25s, transform .25s, box-shadow .25s; min-width:0}
+.card:hover{border-color:var(--navy); transform:translateY(-2px); box-shadow:6px 6px 0 var(--ivory-2), 6px 6px 0 1px var(--line-strong)}
+@media (prefers-reduced-motion:reduce){.card:hover{transform:none}}
+.card-top{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap}
+.chip{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; padding:4px 9px; border-radius:3px; border:1px solid var(--line-strong); color:var(--slate); white-space:nowrap}
+.chip::before{content:""; width:7px; height:7px; background:currentColor}
+.chip.current{background:var(--navy); color:var(--ivory); border-color:var(--navy)}
+.chip.next{border-style:dashed}
+.chip.next::before{background:transparent; border:1px solid currentColor}
+.dates{font-family:var(--mono); font-size:.75rem; color:var(--slate)}
+.card h4{font-size:1.55rem; line-height:1.12}
+.card .where{font-size:.88rem; font-weight:600; color:var(--slate); margin-top:-6px}
+.card .desc{font-size:.95rem; color:#2b3b55}
+.tags{display:flex; flex-wrap:wrap; gap:6px}
+.tags li{font-size:.76rem; padding:3px 9px; border-radius:20px; background:var(--white); border:1px solid var(--line)}
+.outcome{border-top:1px solid var(--line); padding-top:12px; display:flex; flex-direction:column; gap:6px}
+.outcome li{font-size:.9rem; padding-left:18px; position:relative}
+.outcome li::before{content:""; position:absolute; left:0; top:.55em; width:8px; height:8px; --s:4px; background-image:conic-gradient(var(--navy) 0 25%, transparent 0 50%, var(--navy) 0 75%, transparent 0); background-size:8px 8px}
+.field{display:grid; grid-template-columns:96px 1fr; gap:10px; font-size:.9rem}
+.field dt{font-family:var(--mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); padding-top:3px}
+.field dd{margin:0; min-width:0}
+dl.fields{margin:0; display:flex; flex-direction:column; gap:10px}
+@media (max-width:420px){.field{grid-template-columns:1fr; gap:2px}}
+
+.proj-img{aspect-ratio:16/9; max-width:100%; border-radius:4px; overflow:hidden; border:1px solid var(--line); display:grid; place-items:center; --s:18px; --a:var(--ivory-2); --b:var(--ivory); position:relative}
+.proj-img img{width:100%; height:100%; object-fit:cover}
+.proj-img span{font-family:var(--mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); background:var(--ivory); padding:4px 10px; border:1px dashed var(--slate); border-radius:3px}
+
+/* leadership list */
+.roles{border-top:1px solid var(--navy)}
+.role{display:grid; grid-template-columns:150px minmax(0,1fr) minmax(0,1.3fr); gap:12px 32px; padding:22px 4px; border-bottom:1px solid var(--line); transition:background .2s}
+.role:hover{background:var(--ivory)}
+.role .dates{padding-top:6px}
+.role h4{font-size:1.35rem}
+.role .org{font-size:.88rem; font-weight:600; color:var(--slate)}
+.role p{font-size:.94rem; color:#2b3b55}
+@media (max-width:760px){.role{grid-template-columns:1fr; gap:6px}}
+
+/* beyond the board */
+.beyond{background:var(--ivory); border-radius:var(--radius); padding:clamp(20px,3vw,36px); border:1px solid var(--line)}
+.tiles{display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:16px}
+.tile{grid-column:span 2; background:var(--white); border:1px solid var(--line); border-radius:var(--radius); padding:24px; display:flex; flex-direction:column; gap:10px; min-width:0; transition:border-color .2s}
+.tile:hover{border-color:var(--navy)}
+.tile.wide{grid-column:span 3}
+.tile.feature{grid-column:span 3; background:var(--navy); color:var(--ivory); border-color:var(--navy); position:relative; overflow:hidden}
+.tile.feature .label{color:var(--mist)}
+.tile.feature p{color:#dbe2ec}
+.tile.feature .feature-sq{position:absolute; right:-1px; top:-1px; width:112px; height:112px; --s:28px; --a:var(--navy); --b:#1d3560; opacity:.9}
+.tile h4{font-size:1.5rem}
+.tile p{font-size:.93rem; color:#2b3b55}
+.tile a{text-underline-offset:3px}
+.tile .glyph{width:34px; height:34px}
+@media (max-width:900px){.tile,.tile.wide,.tile.feature{grid-column:span 3}}
+@media (max-width:600px){.tiles{grid-template-columns:1fr}.tile,.tile.wide,.tile.feature{grid-column:auto}}
+
+/* achievements */
+.timeline{position:relative; display:flex; flex-direction:column}
+.tl-item{display:grid; grid-template-columns:110px 28px minmax(0,1fr); gap:0 18px; padding-bottom:26px}
+.tl-year{font-family:var(--display); font-size:1.6rem; line-height:1; text-align:right}
+.tl-mark{position:relative; display:flex; justify-content:center}
+.tl-mark::before{content:""; position:absolute; top:22px; bottom:-26px; width:1px; background:var(--line-strong)}
+.tl-item:last-child .tl-mark::before{display:none}
+.tl-mark i{width:14px; height:14px; margin-top:5px; border:1px solid var(--navy); --s:3.5px; display:block}
+.tl-body h4{font-family:var(--sans); font-weight:700; font-size:1rem; line-height:1.4}
+.tl-body p{font-size:.9rem; color:var(--slate)}
+@media (max-width:520px){.tl-item{grid-template-columns:28px minmax(0,1fr)}.tl-year{grid-column:2; text-align:left; font-size:1.25rem; margin-bottom:4px}.tl-mark{grid-row:1 / span 2; grid-column:1}.tl-body{grid-column:2}}
+
+/* ── ENDGAME ───────────────────────────────────────── */
+.dark{background:var(--midnight); color:var(--ivory)}
+.dark .label{color:var(--mist)}
+.endgame .act-num{color:#2a3f62}
+.end-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(32px,6vw,80px); align-items:center; padding-bottom:clamp(56px,8vw,96px)}
+@media (max-width:860px){.end-grid{grid-template-columns:1fr}}
+.qmark{font-family:var(--display); font-size:clamp(11rem,26vw,20rem); line-height:.75; color:var(--ivory); display:block; margin-bottom:8px}
+.end-copy{display:flex; flex-direction:column; gap:20px; min-width:0}
+.end-copy p{max-width:52ch; color:#cfd8e5; font-size:1.0625rem}
+.contact{border:1px solid var(--line-dark); border-radius:var(--radius); padding:22px; display:flex; flex-direction:column; gap:16px; margin-top:8px}
+.email-row{display:flex; flex-wrap:wrap; align-items:center; gap:12px}
+.email{font-family:var(--display); font-size:clamp(1.35rem,3vw,1.9rem); color:var(--ivory); text-decoration:none; word-break:break-all; user-select:all; border-bottom:1px solid var(--slate)}
+.email:hover{border-bottom-color:var(--ivory)}
+.copy-btn{background:transparent; color:var(--ivory); border:1px solid var(--mist); border-radius:4px; padding:7px 12px; font:600 .8rem var(--sans); cursor:pointer}
+.copy-btn:hover{background:var(--ivory); color:var(--midnight)}
+.links{display:flex; flex-wrap:wrap; gap:10px}
+.links a,.links span{font-size:.85rem; font-weight:600; padding:8px 14px; border:1px solid var(--line-dark); border-radius:4px; text-decoration:none; color:var(--ivory); transition:border-color .2s, background .2s}
+.links a:hover{border-color:var(--ivory); background:rgba(247,245,239,.06)}
+.links span{color:var(--mist); border-style:dashed; cursor:not-allowed}
+.end-board .board{border-color:var(--mist); box-shadow:none}
+.end-board .sq.d{background:#14294A}
+.end-board .sq.l{background:#1C3359}
+.end-board .sq.promo{background:var(--ivory); display:grid; place-items:center; font-family:var(--display); font-size:clamp(1.2rem,3vw,1.9rem); color:var(--midnight); animation:pulse 3.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(247,245,239,.0)}50%{box-shadow:0 0 0 6px rgba(247,245,239,.18)}}
+@media (prefers-reduced-motion:reduce){.end-board .sq.promo{animation:none}}
+.end-board .ranks,.end-board .files{color:var(--mist)}
+.end-board .board-note{border-top-color:var(--line-dark)}
+.end-board .board-note .label{color:var(--mist)}
+.finale{border-top:1px solid var(--line-dark); padding-block:40px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px}
+.finale p{font-family:var(--display); font-style:italic; font-size:var(--step-3)}
+.finale a{color:var(--mist); font-size:.85rem; font-weight:600; text-underline-offset:4px}
+.finale a:hover{color:var(--ivory)}
+footer{font-family:var(--mono); font-size:.7rem; color:var(--slate); padding-block:18px 28px; letter-spacing:.06em}
+
+.to-top{position:fixed; right:max(18px, calc(env(safe-area-inset-right,0px) + 18px)); bottom:calc(env(safe-area-inset-bottom,0px) + 18px); z-index:40; width:46px; height:46px; border:1px solid var(--navy); --s:11.5px; cursor:pointer; display:grid; place-items:center; padding:0; border-radius:3px; opacity:0; transform:translateY(8px); transition:opacity .25s, transform .25s; pointer-events:none}
+.to-top.show{opacity:1; transform:none; pointer-events:auto}
+.to-top b{background:var(--ivory); color:var(--navy); font:700 .62rem var(--mono); letter-spacing:.06em; padding:3px 4px; border:1px solid var(--navy)}
+@media (prefers-reduced-motion:reduce){.to-top{transition:none}}
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+</style>
+</head>
+<body>
+
+
+<!-- ─────────────────────────────────────────────────────────────
+  EDITING GUIDE
+  All content lives in the SITE object in the <script> at the bottom.
+  • Text wrapped in [[double brackets]] renders as a marked placeholder — replace it.
+  • Reorder or remove items by editing the arrays; layout updates automatically.
+  • Status for research/projects: "current" | "completed" | "upcoming".
+  • A link set to "" renders as a disabled "add link" chip instead of a dead button.
+───────────────────────────────────────────────────────────── -->
+
+<a class="sr-only" href="#middlegame">Skip to main content</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="mark" href="#opening" aria-label="Back to the opening">
+      <span class="mark-sq checker" aria-hidden="true"></span>
+      <span class="mark-name" id="markName">Nainika Gupta</span>
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
+    <nav class="nav-links" id="navLinks" data-open="false" aria-label="Sections">
+      <a href="#opening"><span class="n">I</span>Opening</a>
+      <a href="#middlegame"><span class="n">II</span>Middlegame</a>
+      <a href="#endgame"><span class="n">III</span>Endgame</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- ═════════ I. OPENING ═════════ -->
+  <section id="opening" aria-labelledby="opening-title">
+    <div class="wrap">
+      <div class="hero">
+        <div class="hero-text">
+          <span class="label">I · Opening — Every game begins with a move.</span>
+          <h1 id="opening-title"></h1>
+          <p class="tagline" id="tagline"></p>
+          <p class="intro" id="intro"></p>
+          <div class="hero-cta">
+            <a class="btn btn-solid" href="#middlegame">Into the middlegame <span class="arr" aria-hidden="true">↓</span></a>
+            <a class="btn btn-ghost" href="#endgame">Get in touch</a>
+          </div>
+        </div>
+        <figure class="board-wrap" style="margin:0">
+          <div class="board-frame">
+            <div class="ranks" aria-hidden="true"></div>
+            <div class="board" id="heroBoard" role="img" aria-label="A navy and ivory chessboard. A knight moves from g1 to f3."></div>
+            <div class="files" aria-hidden="true"></div>
+          </div>
+          <figcaption class="board-note">
+            <span class="move">1. Nf3</span>
+            <span class="label" style="align-self:center">Develop first. Stay flexible.</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="opening-lower">
+        <article class="edu" aria-labelledby="edu-title">
+          <span class="label">Education</span>
+          <h3 id="edu-title"></h3>
+          <dl id="eduList"></dl>
+        </article>
+        <nav class="preview" aria-label="What's on this page" id="preview"></nav>
+      </div>
+    </div>
+    <div class="strip checker" aria-hidden="true"></div>
+  </section>
+
+  <!-- ═════════ II. MIDDLEGAME ═════════ -->
+  <section id="middlegame" class="middlegame" aria-labelledby="mg-title">
+    <div class="wrap">
+      <div class="act-head">
+        <span class="act-num" aria-hidden="true">II</span>
+        <span class="label">Middlegame</span>
+        <h2 id="mg-title">Where ideas become moves.</h2>
+      </div>
+
+      <section class="sub" id="research" aria-labelledby="research-title">
+        <div class="sub-head">
+          <h3 id="research-title"><span class="file">a</span>Research</h3>
+          <p>Labs where I've learned to ask a narrow question carefully, from molecular biology and cardiology to materials and ecology.</p>
+        </div>
+        <div class="grid grid-2" id="researchList"></div>
+      </section>
+
+      <section class="sub" id="projects" aria-labelledby="projects-title">
+        <div class="sub-head">
+          <h3 id="projects-title"><span class="file">b</span>Engineering &amp; Projects</h3>
+          <p>Things I've designed, prototyped or started, usually with a team and usually after a few failed drafts.</p>
+        </div>
+        <div class="grid grid-2" id="projectList"></div>
+      </section>
+
+      <section class="sub" id="leadership" aria-labelledby="lead-title">
+        <div class="sub-head">
+          <h3 id="lead-title"><span class="file">c</span>Leadership &amp; Community</h3>
+          <p>The people and groups I show up for.</p>
+        </div>
+        <div class="roles" id="roleList"></div>
+      </section>
+
+      <section class="sub" id="beyond" aria-labelledby="beyond-title">
+        <div class="sub-head">
+          <h3 id="beyond-title"><span class="file">d</span>Beyond the Board</h3>
+          <p>What I do with the other half of my brain.</p>
+        </div>
+        <div class="beyond"><div class="tiles" id="tileList"></div></div>
+      </section>
+
+      <section class="sub" id="achievements" aria-labelledby="ach-title">
+        <div class="sub-head">
+          <h3 id="ach-title"><span class="file">e</span>Selected Achievements</h3>
+          <p>A short record of milestones worth noting on the scoresheet.</p>
+        </div>
+        <ol class="timeline" id="timeline"></ol>
+      </section>
+    </div>
+  </section>
+
+  <!-- ═════════ III. ENDGAME ═════════ -->
+  <section id="endgame" class="endgame dark" aria-labelledby="eg-title">
+    <div class="strip lg checker" style="--a:var(--midnight); --b:var(--navy)" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="act-head">
+        <span class="act-num" aria-hidden="true">III</span>
+        <span class="label">Endgame</span>
+        <h2 id="eg-title">The next move is unwritten.</h2>
+      </div>
+      <div class="end-grid">
+        <div class="end-copy">
+          <span class="qmark" aria-hidden="true">?</span>
+          <p id="endCopy"></p>
+          <div class="contact">
+            <span class="label">Write to me</span>
+            <div class="email-row">
+              <a class="email" id="email" href="#"></a>
+              <button class="copy-btn" id="copyBtn" type="button">Copy</button>
+            </div>
+            <div class="links" id="links"></div>
+          </div>
+        </div>
+        <figure class="board-wrap end-board" style="margin:0">
+          <div class="board-frame">
+            <div class="ranks" aria-hidden="true"></div>
+            <div class="board" id="endBoard" role="img" aria-label="An almost empty board. A single pawn stands on g7, one step from the last rank. The promotion square g8 holds a question mark."></div>
+            <div class="files" aria-hidden="true"></div>
+          </div>
+          <figcaption class="board-note">
+            <span class="move">g8 = ?</span>
+            <span class="label" style="align-self:center">A pawn that reaches the last rank can become anything.</span>
+          </figcaption>
+        </figure>
+      </div>
+      <div class="finale">
+        <p>Every ending is another opening.</p>
+        <a href="#opening">↑ Return to the opening</a>
+      </div>
+      <footer id="footer"></footer>
+    </div>
+  </section>
+</main>
+
+<button class="to-top checker" id="toTop" aria-label="Return to the opening"><b>a1</b></button>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   SITE CONTENT — edit everything here. [[...]] = placeholder.
+   ═══════════════════════════════════════════════════════════════ */
+const SITE = {
+  name: { first: "Nainika", last: "Gupta" },
+  tagline: "Engineer in training, strategist by habit, curious about every square on the board.",
+  intro: "I'm a first-year biomedical engineering student at Duke who grew up between Hackensack, Houston and Singapore. I'm drawn to the places where biology meets design, from laser-engineering nanomaterials out of rice husk waste to making CRISPR-associated transposons edit more efficiently. Off the bench, I dance, bake, edit video, and still play the occasional game of chess.",
+
+  education: {
+    school: "Duke University",
+    rows: [
+      ["Degree", "B.S.E. Biomedical Engineering, Pratt School of Engineering · Certificate in Innovation & Entrepreneurship"],
+      ["Class", "2030 (Aug 2026 – May 2030)"],
+      ["Coursework", "Molecular Biology (BIO 201L), Linear Algebra (MATH 218D), Engineering Computation (EGR 105), Engineering Design (EGR 101)"],
+      ["Before Duke", "Raffles Girls' School and Raffles Institution, Singapore · Singapore-Cambridge GCE A-Levels"],
+      ["Languages", "English and Mandarin (native), Korean and Hindi (intermediate), Spanish (beginner)"]
+    ]
+  },
+
+  preview: [
+    { href: "#research",     label: "a · Research",  title: "Six labs",        text: "From A*STAR and RSI to nanomaterials at NUS and two labs at Duke." },
+    { href: "#projects",     label: "b · Projects",  title: "Built by hand",   text: "A culture-plate prototype and an orange-peel upcycling venture." },
+    { href: "#beyond",       label: "d · Beyond",    title: "Off the board",   text: "Chess, dance, baking, film edits and five languages." },
+    { href: "#endgame",      label: "III · Endgame", title: "What's next",     text: "Still unwritten. Say hello." }
+  ],
+
+  /* status: "current" | "completed" | "upcoming". outcomes may be [] */
+  research: [
+    {
+      status: "current",
+      title: "Protein models for immunology",
+      where: "Azoitei Lab · Duke University",
+      role: "Research Assistant",
+      dates: "Fall 2026 – present",
+      desc: "Exploring structural models of proteins involved in the immune response, pairing AlphaFold predictions with hands-on molecular biology.",
+      methods: ["AlphaFold", "Protein structure modeling", "Molecular biology"],
+      outcomes: []
+    },
+    {
+      status: "upcoming",
+      title: "Biomaterials for skin regeneration",
+      where: "Segura Lab · Duke University",
+      role: "Research Assistant",
+      dates: "Beginning Spring 2027",
+      desc: "Joining a biomaterials lab to work on skin regeneration, with both computational and wet-lab components.",
+      methods: ["Biomaterial scaffolds", "Computational work", "Wet lab"],
+      outcomes: []
+    },
+    {
+      status: "completed",
+      title: "Engineering CRISPR-associated transposons",
+      where: "Beh Lab · A*STAR Institute of Molecular and Cell Biology, Singapore",
+      role: "Synthetic Biology Research Intern",
+      dates: "Dec 2025 – Jun 2026",
+      desc: "Used saturation mutagenesis across 95 target sites to find mutations that make CAST genome-editing systems transpose more efficiently, toward treatments for genetic eye disorders.",
+      methods: ["Saturation mutagenesis", "qPCR (1,000+ runs)", "Junction PCR", "Gibson Assembly", "Cloning", "Gel electrophoresis", "Cell culture", "Miniprep"],
+      outcomes: [
+        "Co-author on the resulting manuscript (in preparation)",
+        "Designed mutagenesis libraries that raised editing efficiency 6-fold",
+        "Helped design a high-throughput screen of 1,700+ protein mutations in 3 months",
+        "Meta-analysis that helped the lab secure a SGD 100,000 grant"
+      ]
+    },
+    {
+      status: "completed",
+      title: "NETosis in hyperglycemic cardiomyocytes",
+      where: "Chen Lab · Tufts Medical Center, Research Science Institute",
+      role: "Research Scholar",
+      dates: "Jun – Aug 2024",
+      desc: "Investigated Dex-TO and metformin as regulators of NETosis in hyperglycemic cardiomyocytes, and evaluated Dex-TO as a theranostic platform for myocardial infarction.",
+      methods: ["Immunofluorescence assays", "Murine imaging data analysis"],
+      outcomes: [
+        "Top 10 Oral Presenter at RSI 2024; 1 of 100 scholars selected internationally",
+        "Found novel localisation of autophagy and HMGB1 in hyperglycemic cardiomyocytes"
+      ]
+    },
+    {
+      status: "completed",
+      title: "Laser-engineered materials from waste",
+      where: "Nanomaterials Research Lab · National University of Singapore",
+      role: "Student Researcher",
+      dates: "Apr 2022 – Jun 2025",
+      desc: "Upcycled rice husk ash into carbon-silica composites using laser annealing, with potential uses in chemical sensing, photonic circuitry, antimicrobial agents and superlensing.",
+      methods: ["Laser annealing", "CNC & pulsed-laser processing", "SEM-EDX", "Raman spectroscopy", "Fluorescence microscopy"],
+      outcomes: [
+        "Led a research team for 2 years on laser-patterned silver nanoparticles on graphene oxide films and ZnO nanowires",
+        "Four Singapore Science & Engineering Fair awards (2022–2025)"
+      ]
+    },
+    {
+      status: "completed",
+      title: "Wetland restoration ecology",
+      where: "National University of Singapore · Dual Enrollment Programme",
+      role: "Student Researcher",
+      dates: "Jan – Aug 2025",
+      desc: "Studied how well restoration efforts at the Singapore Botanic Gardens wetland are working, including how soil organic matter relates to monitor lizard sightings.",
+      methods: ["Field research", "Ecological analysis"],
+      outcomes: ["Authored an independent research thesis under faculty mentorship"]
+    }
+  ],
+
+  /* any field left "" is hidden; image is optional, e.g. "images/lid.jpg" */
+  projects: [
+    {
+      status: "current",
+      title: "Anti-evaporation culture plate lid",
+      context: "Duke · Fall 2026",
+      image: "",
+      problem: "Gel-based cell cultures dry out over a 16-day incubation.",
+      contribution: "Designing and prototyping a new plate lid from scratch with a team of first-years.",
+      methods: "",
+      outcome: "Prototyping in progress"
+    },
+    {
+      status: "completed",
+      title: "Orange for Green",
+      context: "Founder · Singapore · Oct 2024 – Jun 2025",
+      image: "",
+      problem: "Fruit vendors throw away large amounts of orange peel every day.",
+      contribution: "Founded the project and partnered with local vendors to turn peel waste into disinfectants and fertilizers, then gave them out while teaching residents about green waste management.",
+      methods: "",
+      outcome: "About 20 kg of peel repurposed. Significant Achievement Award at the National Geographic Slingshot Challenge 2025 (top 0.5% of 2,700+ entries)."
+    }
+  ],
+
+  leadership: [
+    {
+      title: "First-Year Representative, Community Team",
+      org: "Asian Students Association · Duke",
+      dates: "Sep 2026 – present",
+      text: "Plan community events with ASA's community team while shadowing the executive board. Our first event is in mid-November."
+    },
+    {
+      title: "Member",
+      org: "Catalyst · Duke",
+      dates: "Fall 2026 – present",
+      text: "Catalyst is Duke's pre-professional tech organization. As a new member, I'm building technical foundations through weekly coding interviews and team projects, including this website."
+    },
+    {
+      title: "Dancer",
+      org: "Defining Movement · Duke",
+      dates: "Fall 2026 – present",
+      text: "Perform with Duke's multicultural dance group."
+    },
+    {
+      title: "Co-President",
+      org: "Raffles Chess Club · Singapore",
+      dates: "May 2022 – May 2025",
+      text: "Led training across middle and high school divisions with level-based sessions, and organized and arbitrated an inter-school tournament for 8 high schools, earning a National Arbiter norm."
+    },
+    {
+      title: "Co-President & Mentor",
+      org: "youthSTEM · Singapore",
+      dates: "Feb 2024 – Jun 2025",
+      text: "Led a 12-person team running STEM camps with Science Centre Singapore and NUS for 50+ elementary and middle school students, and trained the student volunteers who mentored there."
+    }
+  ],
+
+  /* size: "" | "wide" | "feature" (feature = navy tile) */
+  interests: [
+    { size: "feature", label: "Chess · FIDE 1762", title: "Once competitive, still devoted",
+      text: "I played internationally through high school and reached #5 in Singapore's women's rankings. Now I play for fun, but the habits stayed: patience, pattern recognition, and respect for a quiet move." },
+    { size: "wide", label: "Dance", title: "Movement as language",
+      text: "I dance with Defining Movement at Duke and film dance covers in my spare hours." },
+    { size: "", label: "Baking", title: "Signature bakes",
+      text: "Blueberry crumble and Biscoff cheesecake, tested on friends without mercy." },
+    { size: "", label: "Video", title: "Vlogs & edits",
+      text: "I edit vlogs and short films. One of my educational videos was among 6 global winners of the Superintelligence Imagined contest." },
+    { size: "", label: "Languages", title: "Five and counting",
+      text: "English and Mandarin natively, Korean and Hindi at an intermediate level, and Spanish as a beginner." }
+  ],
+
+  achievements: [
+    { year: "2025", title: "National Geographic Slingshot Challenge: Significant Achievement Award", text: "Top 0.5% of 2,700+ submissions, for Orange for Green." },
+    { year: "2025", title: "National STEM Talent Search: Commendation Award", text: "Top 9 of 600+ projects nationwide." },
+    { year: "2024", title: "Top 10 Oral Presenter, Research Science Institute", text: "One of 3 students representing Singapore at RSI (MIT & CEE)." },
+    { year: "2024", title: "Superintelligence Imagined Creative Contest", text: "1 of 6 winners globally, Future of Life Institute." },
+    { year: "2024", title: "#5 in women's chess, Singapore", text: "National ranking, February 2024." },
+    { year: "2023", title: "Teplice International Open: Top 8 Women", text: "International chess tournament, Czech Republic." },
+    { year: "2022–25", title: "Singapore Science & Engineering Fair: four awards", text: "Silver 2025, Bronze 2024, Silver 2023, Merit 2022, for materials engineering research." },
+    { year: "2022", title: "National Age Group Chess Champion, Girls Under 16", text: "Plus national school team champions every season from 2020 to 2024." }
+  ],
+
+  endgame: "I don't know exactly where this game goes yet, and I'm comfortable with that. For now I'm learning, building, and following good questions wherever they lead. If you're working where biology meets engineering, or you'd just like to talk science, design or chess, I'd love to hear from you.",
+
+  contact: {
+    email: "nainika.g27@gmail.com",
+    links: [
+      { text: "LinkedIn", href: "https://sg.linkedin.com/in/nainikag" },
+      { text: "Résumé (PDF)", href: "resume.pdf" },
+      { text: "Substack", href: "https://substack.com/@nainikagupta" }
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDERING — no need to edit below
+   ═══════════════════════════════════════════════════════════════ */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = s => esc(s).replace(/\[\[(.+?)\]\]/g, '<span class="ph" title="Placeholder — edit in SITE">$1</span>');
+const $ = id => document.getElementById(id);
+const STATUS = { current: ["current","In play"], completed: ["","Played"], upcoming: ["next","Next move"] };
+const chip = s => { const [c,t] = STATUS[s] || STATUS.completed; return `<span class="chip ${c}">${t}</span>`; };
+
+/* opening */
+$("opening-title").innerHTML = `${fmt(SITE.name.first)}<br><em>${fmt(SITE.name.last)}</em>`;
+$("markName").textContent = `${SITE.name.first} ${SITE.name.last}`;
+$("tagline").innerHTML = fmt(SITE.tagline);
+$("intro").innerHTML = fmt(SITE.intro);
+$("edu-title").innerHTML = fmt(SITE.education.school);
+$("eduList").innerHTML = SITE.education.rows.map(([k,v]) => `<dt>${fmt(k)}</dt><dd>${fmt(v)}</dd>`).join("");
+$("preview").innerHTML = SITE.preview.map(p => `<a href="${esc(p.href)}"><span class="label">${fmt(p.label)}</span><h4>${fmt(p.title)}</h4><p>${fmt(p.text)}</p></a>`).join("");
+
+/* research */
+$("researchList").innerHTML = SITE.research.map(r => `
+  <article class="card">
+    <div class="card-top">${chip(r.status)}<span class="dates">${fmt(r.dates)}</span></div>
+    <h4>${fmt(r.title)}</h4>
+    <p class="where">${fmt(r.where)} · ${fmt(r.role)}</p>
+    <p class="desc">${fmt(r.desc)}</p>
+    <ul class="tags" aria-label="Methods">${r.methods.map(m => `<li>${fmt(m)}</li>`).join("")}</ul>
+    ${r.outcomes.length ? `<ul class="outcome" aria-label="Outcomes">${r.outcomes.map(o => `<li>${fmt(o)}</li>`).join("")}</ul>` : ""}
+  </article>`).join("");
+
+/* projects */
+$("projectList").innerHTML = SITE.projects.map(p => {
+  const f = (k, v) => v ? `<div class="field"><dt>${k}</dt><dd>${fmt(v)}</dd></div>` : "";
+  return `
+  <article class="card">
+    ${p.image ? `<div class="proj-img"><img src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy"></div>` : ""}
+    <div class="card-top">${chip(p.status)}<span class="dates">${fmt(p.context)}</span></div>
+    <h4>${fmt(p.title)}</h4>
+    <dl class="fields">${f("Problem", p.problem)}${f("My part", p.contribution)}${f("Methods", p.methods)}${f("Outcome", p.outcome)}</dl>
+  </article>`;
+}).join("");
+
+/* leadership */
+$("roleList").innerHTML = SITE.leadership.map(l => `
+  <article class="role">
+    <span class="dates">${fmt(l.dates)}</span>
+    <div><h4>${fmt(l.title)}</h4><p class="org">${fmt(l.org)}</p></div>
+    <p>${fmt(l.text)}</p>
+  </article>`).join("");
+
+/* beyond */
+$("tileList").innerHTML = SITE.interests.map(t => `
+  <article class="tile ${esc(t.size)}">
+    ${t.size === "feature" ? '<span class="feature-sq checker" aria-hidden="true"></span>' : ""}
+    <span class="label">${fmt(t.label)}</span>
+    <h4>${fmt(t.title)}</h4>
+    <p>${fmt(t.text)}${t.link ? ` <a href="${esc(t.link.href)}" target="_blank" rel="noopener">${fmt(t.link.text)}</a>` : ""}</p>
+  </article>`).join("");
+
+/* achievements */
+$("timeline").innerHTML = SITE.achievements.map(a => `
+  <li class="tl-item">
+    <span class="tl-year">${fmt(a.year)}</span>
+    <span class="tl-mark" aria-hidden="true"><i class="checker"></i></span>
+    <div class="tl-body"><h4>${fmt(a.title)}</h4><p>${fmt(a.text)}</p></div>
+  </li>`).join("");
+
+/* endgame */
+$("endCopy").innerHTML = fmt(SITE.endgame);
+const emailEl = $("email");
+emailEl.textContent = SITE.contact.email;
+emailEl.href = "mailto:" + SITE.contact.email;
+$("links").innerHTML = SITE.contact.links.map(l => l.href
+  ? `<a href="${esc(l.href)}" target="_blank" rel="noopener">${fmt(l.text)} ↗</a>`
+  : `<span title="Add this link in SITE.contact.links">${fmt(l.text)} · add link</span>`).join("");
+$("copyBtn").addEventListener("click", async e => {
+  const btn = e.currentTarget;
+  try { await navigator.clipboard.writeText(SITE.contact.email); btn.textContent = "Copied"; }
+  catch { const r = document.createRange(); r.selectNodeContents(emailEl); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected"; }
+  setTimeout(() => btn.textContent = "Copy", 1800);
+});
+$("footer").textContent = `© ${new Date().getFullYear()} ${SITE.name.first} ${SITE.name.last} · Durham, NC`;
+
+/* ── boards ─────────────────────────────────────── */
+const FILES = "abcdefgh";
+const SVG = {
+  knight: c => `<svg viewBox="0 0 100 100" aria-hidden="true"><path fill="${c}" d="M28 92H72V84H66C68 66 72 48 66 32C61 19 50 12 40 12L37 6L31 15C24 19 18 28 16 38L14 46C16 50 20 52 24 50L32 44C38 44 42 42 46 40C44 52 34 62 32 76V84H28Z"/><circle cx="33" cy="27" r="2.6" fill="var(--ivory)"/></svg>`,
+  pawn:   c => `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="27" r="13" fill="${c}"/><path fill="${c}" d="M39 44Q50 38 61 44L65 80H35Z"/><rect x="25" y="80" width="50" height="11" rx="2" fill="${c}"/></svg>`,
+  rook:   c => `<svg viewBox="0 0 100 100" aria-hidden="true"><path fill="${c}" d="M28 14H38V22H45V14H55V22H62V14H72V34L66 40V78H34V40L28 34Z"/><rect x="24" y="80" width="52" height="11" rx="2" fill="${c}"/></svg>`
+};
+function buildBoard(boardEl, opts = {}) {
+  const frame = boardEl.parentElement;
+  frame.querySelector(".ranks").innerHTML = [8,7,6,5,4,3,2,1].map(n => `<span>${n}</span>`).join("");
+  frame.querySelector(".files").innerHTML = [...FILES].map(f => `<span>${f}</span>`).join("");
+  let html = "";
+  for (let r = 8; r >= 1; r--) for (let f = 0; f < 8; f++) {
+    const sq = FILES[f] + r, dark = (f + r) % 2 === 0;
+    const cls = ["sq", dark ? "d" : "l"];
+    if (opts.hl?.includes(sq)) cls.push("hl");
+    if (opts.promo === sq) cls.push("promo");
+    html += `<div class="${cls.join(" ")}" data-sq="${sq}">${opts.promo === sq ? "?" : ""}</div>`;
+  }
+  boardEl.innerHTML = html;
+}
+const pos = sq => ({ left: FILES.indexOf(sq[0]) * 12.5 + "%", top: (8 - +sq[1]) * 12.5 + "%" });
+function place(boardEl, svg, sq, extra = "") {
+  const p = document.createElement("div");
+  p.className = "piece " + extra; p.innerHTML = svg;
+  Object.assign(p.style, pos(sq));
+  boardEl.appendChild(p); return p;
+}
+
+const hero = $("heroBoard");
+buildBoard(hero, { hl: ["g1","f3"] });
+place(hero, SVG.rook("var(--mist)"), "a8", "ghost");
+place(hero, SVG.pawn("var(--mist)"), "e4", "ghost");
+place(hero, SVG.knight("var(--mist)"), "g1", "ghost");
+const knight = place(hero, SVG.knight("var(--slate)"), "g1");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reduce) Object.assign(knight.style, pos("f3"));
+else setTimeout(() => Object.assign(knight.style, pos("f3")), 650);
+
+const end = $("endBoard");
+buildBoard(end, { promo: "g8" });
+place(end, SVG.pawn("var(--ivory)"), "g7");
+
+/* ── nav: active section, mobile menu, back-to-top ─ */
+const links = [...document.querySelectorAll(".nav-links a")];
+const acts = ["opening","middlegame","endgame"].map(id => $(id));
+function setActive() {
+  const y = scrollY + innerHeight * 0.35;
+  let cur = acts[0].id;
+  acts.forEach(s => { if (s.offsetTop <= y) cur = s.id; });
+  links.forEach(a => a.setAttribute("aria-current", a.getAttribute("href") === "#" + cur ? "true" : "false"));
+  $("toTop").classList.toggle("show", scrollY > innerHeight * 0.8);
+}
+addEventListener("scroll", setActive, { passive: true });
+addEventListener("resize", setActive);
+setActive();
+
+const menuBtn = $("menuBtn"), navLinks = $("navLinks");
+menuBtn.addEventListener("click", () => {
+  const open = navLinks.dataset.open !== "true";
+  navLinks.dataset.open = open; menuBtn.setAttribute("aria-expanded", open);
+  menuBtn.textContent = open ? "Close" : "Menu";
+});
+links.forEach(a => a.addEventListener("click", () => { navLinks.dataset.open = "false"; menuBtn.setAttribute("aria-expanded", "false"); menuBtn.textContent = "Menu"; }));
+$("toTop").addEventListener("click", () => $("opening").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }));
+</script>
+
+</body>
+</html>
